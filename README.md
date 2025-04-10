@@ -1,4 +1,3 @@
-Here's a complete README.md tailored for your app. You can copy-paste it directly into a .md file:
 
 * * * * *
 
@@ -99,12 +98,3 @@ GOOGLE_CLIENT_SECRET=your-client-secret
 
 * * * * *
 
-**📄 License**
-
-MIT License
-
-```
----
-
-Let me know if you want to add badges, images, or deployment instructions!
-```
