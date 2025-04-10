@@ -1,36 +1,110 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Here's a complete README.md tailored for your app. You can copy-paste it directly into a .md file:
 
-## Getting Started
+* * * * *
 
-First, run the development server:
+```
+# 🎵 StreamSync
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+**StreamSync** is a collaborative video streaming platform where users can add YouTube music videos, vote on them, and watch them together in a dynamic queue based on community upvotes.
+
+---
+
+## ✨ Features
+
+- 🔐 Authentication via NextAuth
+- 🎥 Embedded YouTube video player with autoplay
+- ➕ Add YouTube video links to stream queue
+- 📈 Community-based upvote/downvote system
+- 🔁 Auto-playback of next highest-voted stream
+- 📤 Share creator profile with others
+- 🗑 Delete your own submitted videos
+- ♻️ Realtime queue updates every 10 seconds
+
+---
+
+## 🛠️ Tech Stack
+
+- **Frontend**: React (Next.js) + TypeScript
+- **Styling**: Tailwind CSS + ShadCN UI
+- **Backend**: Next.js API Routes + Prisma ORM
+- **Database**: PostgreSQL
+- **Auth**: NextAuth.js
+- **Deploy**: Vercel / Render / Railway (suggested)
+
+---
+
+## 📦 Folder Structure
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+/
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+├── app/
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+│  ├── api/
 
-## Learn More
+│  │  └── streams/ → Upvote, Downvote, Create, Delete stream logic
 
-To learn more about Next.js, take a look at the following resources:
+│  └── dashboard/ → Main dashboard interface
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+├── components/  → UI components (Buttons, Cards, etc.)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+├── lib/ → Prisma, Auth helpers
 
-## Deploy on Vercel
+├── prisma/  → Schema and DB logic
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+└── public/  → Static assets
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+---
+
+## 🚀 Getting Started
+
+1. Clone the repository
+
+2. Create a `.env` file using `.env.example`
+
+3. Install dependencies
+
+4. Push Prisma schema to your database
+
+5. Start the dev server
+
+---
+
+## 🔐 Environment Variables
+
+```env
+DATABASE_URL=postgresql://<your-db-url>
+NEXTAUTH_SECRET=<your-secret>
+NEXTAUTH_URL=http://localhost:3000
+GOOGLE_CLIENT_ID=your-client-id
+GOOGLE_CLIENT_SECRET=your-client-secret
+```
+
+* * * * *
+
+**🧩 Prisma Schema Overview**
+
+-  User: Authenticated user via NextAuth
+
+-  Stream: Represents a YouTube video added to the queue
+
+-  Upvote: Tracks which user upvoted which stream
+
+* * * * *
+
+**📸 Screenshots**
+
+> *Add some UI screenshots here to showcase the app visually.*
+
+* * * * *
+
+**📄 License**
+
+MIT License
+
+```
+---
+
+Let me know if you want to add badges, images, or deployment instructions!
+```
