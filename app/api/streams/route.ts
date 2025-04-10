@@ -1,5 +1,3 @@
-export const dynamic = "force-dynamic";
-export const runtime = "nodejs";
 
 import prismaClient from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
