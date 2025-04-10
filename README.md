@@ -2,9 +2,9 @@
 * * * * *
 
 ```
-# 🎵 StreamSync
+# 🎵 Soundroom
 
-**StreamSync** is a collaborative video streaming platform where users can add YouTube music videos, vote on them, and watch them together in a dynamic queue based on community upvotes.
+**Soundroom** is a collaborative video streaming platform where users can add YouTube music videos, vote on them, and watch them together in a dynamic queue based on community upvotes.
 
 ---
 
