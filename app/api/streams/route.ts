@@ -40,6 +40,20 @@ export async function POST(req: NextRequest) {
           email: data.creatorId,
         },
       });
+
+      if(!user){
+        return NextResponse.json(
+            { message: "no user" },
+            { status: 401 }
+        );
+      }
+
+      if(!title){
+        return NextResponse.json(
+            { message: "npm packagae for yt not working" },
+            { status: 404 }
+        );
+      }
   
       const stream = await prismaClient.stream.create({
         data: {
