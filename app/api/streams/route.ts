@@ -1,75 +1,73 @@
-
 import prismaClient from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
-import zod from 'zod';   
-const yt_regex =/^(?:(?:https?:)?\/\/)?(?:www\.)?(?:m\.)?(?:youtu(?:be)?\.com\/(?:v\/|embed\/|watch(?:\/|\?v=))|youtu\.be\/)((?:\w|-){11})(?:\S+)?$/
+import zod from "zod";
 
-const youtubesearchapi = require("youtube-search-api");
+const yt_regex =
+  /^(?:(?:https?:)?\/\/)?(?:www\.)?(?:m\.)?(?:youtu(?:be)?\.com\/(?:v\/|embed\/|watch(?:\/|\?v=))|youtu\.be\/)((?:\w|-){11})(?:\S+)?$/;
 
 const createStreamSchema = zod.object({
-    creatorId: zod.string(),
-    url : zod.string()
-})
+  creatorId: zod.string(),
+  url: zod.string(),
+});
 
+export async function POST(req: NextRequest) {
+  try {
+    const data = createStreamSchema.parse(await req.json());
 
+    const match = data.url.match(yt_regex);
+    if (!match) {
+      return NextResponse.json(
+        { message: "Invalid YouTube URL" },
+        { status: 411 }
+      );
+    }
 
-export async function POST(req: NextRequest){
-    try{
-        const data = createStreamSchema.parse(await req.json())
-        const isyt = data.url.match(yt_regex)
-        if(!isyt){        
-            return NextResponse.json({
-                message: "Error adding stream"
-            },{ 
-                status: 411
-            })
-        }
+    const extractedId = match[1];
+    const oembedUrl = `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${extractedId}&format=json`;
 
+    const oembedRes = await fetch(oembedUrl);
+    if (!oembedRes.ok) {
+      return NextResponse.json(
+        { message: "Failed to fetch video info" },
+        { status: 411 }
+      );
+    }
 
-        const extractedId = data.url.split("?v=")[1];
+    const videoData = await oembedRes.json();
+    const title = videoData.title || "Untitled Video";
 
-        const res = await youtubesearchapi.GetVideoDetails(extractedId);
-        console.log(data.creatorId)
-        const thumbnails = res.thumbnail.thumbnails;
-        thumbnails.sort((a: { width: number }, b: { width: number }) =>
-          a.width < b.width ? -1 : 1,
-        );
-        console.log("reached here")
-        const user: any = await prismaClient.user.findFirst({
-            where:{
-                email: data.creatorId
-            }
-        })
-        const stream = await prismaClient.stream.create({
-            //@ts-ignore
-            data:{               
-                userId: user.id ?? "",
-                url: data.url,
-                extractedId,
-                type: "Youtube",
-                title: res.title ?? "Can't find video",
-                smallImg:
-                (thumbnails.length > 1
-                  ? thumbnails[thumbnails.length - 2].url
-                  : thumbnails[thumbnails.length - 1].url) ??
-                "https://cdn.pixabay.com/photo/2024/02/28/07/42/european-shorthair-8601492_640.jpg",
-                bigImg:
-                thumbnails[thumbnails.length - 1].url ??
-                "https://cdn.pixabay.com/photo/2024/02/28/07/42/european-shorthair-8601492_640.jpg",
-            }
-        });
-        return NextResponse.json({
-            message: "Added Stream",
-            id: stream.id
-        })
-    }catch(e){
-        return NextResponse.json({
-            message: "Error end"
-        },{
-            status: 411
-        })
-    } 
+    // Use the standard thumbnail URL formats
+    const smallImg = `https://img.youtube.com/vi/${extractedId}/mqdefault.jpg`;
+    const bigImg = `https://img.youtube.com/vi/${extractedId}/hqdefault.jpg`;
+
+    const user = await prismaClient.user.findFirst({
+      where: {
+        email: data.creatorId,
+      },
+    });
+
+    const stream = await prismaClient.stream.create({
+      data: {
+        userId: user?.id ?? "",
+        url: data.url,
+        extractedId,
+        type: "Youtube",
+        title,
+        smallImg,
+        bigImg,
+      },
+    });
+
+    return NextResponse.json({
+      message: "Added Stream",
+      id: stream.id,
+    });
+  } catch (e) {
+    console.error("POST /stream error:", e);
+    return NextResponse.json({ message: "Error adding stream" }, { status: 411 });
+  }
 }
+
 
 //req.nextUrl.searchParams.get("creatorId")
 
