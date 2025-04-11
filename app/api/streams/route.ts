@@ -27,7 +27,13 @@ export async function POST(req: NextRequest){
 
 
         const extractedId = data.url.split("?v=")[1];
-
+        if(!extractedId){
+            return NextResponse.json({
+                message: "yt api error"
+            },{ 
+                status: 403
+            })
+        }
         console.log(`extracted id: ${extractedId}`)
 
         const res = await youtubesearchapi.GetVideoDetails(extractedId);
