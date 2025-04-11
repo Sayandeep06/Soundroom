@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "prisma generate && npm install youtube-search-api && next build",
+    "build": "prisma generate && next build",
+    "postinstall": "npm install youtube-search-api",
     "start": "next start",
     "lint": "next lint"
   },
