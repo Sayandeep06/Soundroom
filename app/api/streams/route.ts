@@ -2,7 +2,7 @@
 import prismaClient from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import zod from 'zod';   
-var yt_regex =/^(?:(?:https?:)?\/\/)?(?:www\.)?(?:m\.)?(?:youtu(?:be)?\.com\/(?:v\/|embed\/|watch(?:\/|\?v=))|youtu\.be\/)((?:\w|-){11})(?:\S+)?$/
+const yt_regex =/^(?:(?:https?:)?\/\/)?(?:www\.)?(?:m\.)?(?:youtu(?:be)?\.com\/(?:v\/|embed\/|watch(?:\/|\?v=))|youtu\.be\/)((?:\w|-){11})(?:\S+)?$/
 //@ts-ignore
 import youtubesearchapi from "youtube-search-api";
 
@@ -19,14 +19,16 @@ export async function POST(req: NextRequest){
         const isyt = data.url.match(yt_regex)
         if(!isyt){        
             return NextResponse.json({
-                message: "Error adding stream"
+                message: "Regex"
             },{ 
-                status: 411
+                status: 400
             })
         }
 
 
         const extractedId = data.url.split("?v=")[1];
+
+        console.log(`extracted id: ${extractedId}`)
 
         const res = await youtubesearchapi.GetVideoDetails(extractedId);
         console.log(data.creatorId)
@@ -34,7 +36,7 @@ export async function POST(req: NextRequest){
         thumbnails.sort((a: { width: number }, b: { width: number }) =>
           a.width < b.width ? -1 : 1,
         );
-        console.log("reached here")
+        console.log("reached here before the db call")
         const user: any = await prismaClient.user.findFirst({
             where:{
                 email: data.creatorId
