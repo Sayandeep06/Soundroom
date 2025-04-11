@@ -3,8 +3,8 @@ import prismaClient from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import zod from 'zod';   
 const yt_regex =/^(?:(?:https?:)?\/\/)?(?:www\.)?(?:m\.)?(?:youtu(?:be)?\.com\/(?:v\/|embed\/|watch(?:\/|\?v=))|youtu\.be\/)((?:\w|-){11})(?:\S+)?$/
-//@ts-ignore
-import { Innertube } from "youtubei.js";
+
+const youtubesearchapi = require("youtube-search-api");
 
 const createStreamSchema = zod.object({
     creatorId: zod.string(),
@@ -13,72 +13,63 @@ const createStreamSchema = zod.object({
 
 
 
-export async function POST(req: NextRequest) {
-    try {
-      const data = createStreamSchema.parse(await req.json());
-      const isyt = data.url.match(yt_regex);
-  
-      if (!isyt) {
-        return NextResponse.json({ message: "Regex" }, { status: 400 });
-      }
-  
-      const extractedId = data.url.split("?v=")[1];
-  
-      const youtube = await Innertube.create();
-      const res = await youtube.getBasicInfo(extractedId);
-      const info = res.basic_info;
-  
-      const url = `https://www.youtube.com/watch?v=${extractedId}`;
-      const title = info.title ?? "Can't find video";
-  
-      const thumbnails = info.thumbnail ?? [];
-      const smallImg = thumbnails[0]?.url ?? "";
-      const bigImg = thumbnails[thumbnails.length - 1]?.url ?? "";
-  
-      const user = await prismaClient.user.findFirst({
-        where: {
-          email: data.creatorId,
-        },
-      });
+export async function POST(req: NextRequest){
+    try{
+        const data = createStreamSchema.parse(await req.json())
+        const isyt = data.url.match(yt_regex)
+        if(!isyt){        
+            return NextResponse.json({
+                message: "Error adding stream"
+            },{ 
+                status: 411
+            })
+        }
 
-      if(!user){
-        return NextResponse.json(
-            { message: "no user" },
-            { status: 401 }
-        );
-      }
 
-      if(!title){
-        return NextResponse.json(
-            { message: "npm packagae for yt not working" },
-            { status: 404 }
+        const extractedId = data.url.split("?v=")[1];
+
+        const res = await youtubesearchapi.GetVideoDetails(extractedId);
+        console.log(data.creatorId)
+        const thumbnails = res.thumbnail.thumbnails;
+        thumbnails.sort((a: { width: number }, b: { width: number }) =>
+          a.width < b.width ? -1 : 1,
         );
-      }
-  
-      const stream = await prismaClient.stream.create({
-        data: {
-          userId: user?.id ?? "",
-          url,
-          extractedId,
-          type: "Youtube",
-          title,
-          smallImg,
-          bigImg,
-        },
-      });
-  
-      return NextResponse.json({
-        message: "Added Stream",
-        id: stream.id,
-      });
-    } catch (e) {
-      console.error("Error while creating stream:", e);
-      return NextResponse.json(
-        { message: "Error end" },
-        { status: 411 }
-      );
-    }
-  }
+        console.log("reached here")
+        const user: any = await prismaClient.user.findFirst({
+            where:{
+                email: data.creatorId
+            }
+        })
+        const stream = await prismaClient.stream.create({
+            //@ts-ignore
+            data:{               
+                userId: user.id ?? "",
+                url: data.url,
+                extractedId,
+                type: "Youtube",
+                title: res.title ?? "Can't find video",
+                smallImg:
+                (thumbnails.length > 1
+                  ? thumbnails[thumbnails.length - 2].url
+                  : thumbnails[thumbnails.length - 1].url) ??
+                "https://cdn.pixabay.com/photo/2024/02/28/07/42/european-shorthair-8601492_640.jpg",
+                bigImg:
+                thumbnails[thumbnails.length - 1].url ??
+                "https://cdn.pixabay.com/photo/2024/02/28/07/42/european-shorthair-8601492_640.jpg",
+            }
+        });
+        return NextResponse.json({
+            message: "Added Stream",
+            id: stream.id
+        })
+    }catch(e){
+        return NextResponse.json({
+            message: "Error end"
+        },{
+            status: 411
+        })
+    } 
+}
 
 //req.nextUrl.searchParams.get("creatorId")
 
