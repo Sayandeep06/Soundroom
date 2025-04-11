@@ -16,14 +16,14 @@ const createStreamSchema = zod.object({
 export async function POST(req: NextRequest){
     try{
         const data = createStreamSchema.parse(await req.json())
-        const isyt = data.url.match(yt_regex)
-        if(!isyt){        
+        //const isyt = data.url.match(yt_regex)
+       {/* if(!isyt){        
             return NextResponse.json({
                 message: "Regex"
             },{ 
                 status: 400
             })
-        }
+        }*/}
 
 
         const extractedId = data.url.split("?v=")[1];
