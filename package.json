@@ -36,6 +36,7 @@
     "youtube-search-api": "^1.2.2",
     "youtube-search-api-ts": "^1.2.8",
     "youtube-thumbnails": "^1.1.0",
+    "youtubei.js": "^13.3.0",
     "zod": "^3.24.2"
   },
   "devDependencies": {
