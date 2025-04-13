@@ -36,7 +36,6 @@ export async function POST(req: NextRequest) {
     const videoData = await oembedRes.json();
     const title = videoData.title || "Untitled Video";
 
-    // Use the standard thumbnail URL formats
     const smallImg = `https://img.youtube.com/vi/${extractedId}/mqdefault.jpg`;
     const bigImg = `https://img.youtube.com/vi/${extractedId}/hqdefault.jpg`;
 
